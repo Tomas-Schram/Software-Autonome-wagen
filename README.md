@@ -14,6 +14,15 @@ Deze repo is een eerste basis voor de software. De code is zo opgebouwd dat alle
 - safety: veilig rijden, afremmen en stoppen
 - core: de basis van de auto
 
+### Snelle uitleg per map
+
+- core = basis van de auto
+- hardware = echte toestellen en sensoren
+- control = bestuurlijke logica
+- navigation = route en richting kiezen
+- safety = veilig rijden
+- tests = controle van de code
+
 ## Waar vind je wat?
 
 ### src/autonome_wagen/
@@ -45,7 +54,7 @@ Hier staan tests.
 
 Deze tests laten zien of de verschillende onderdelen werken. Ze zijn handig om te controleren of de code nog goed doet wat hij moet doen.
 
-## Voorbeeld van de werking
+## Voorbeeld van dewerking
 
 1. De auto leest sensoren.
 2. De auto beslist wat te doen.
@@ -61,24 +70,3 @@ Als iets veranderd, is het belangrijk om de code te houden:
 - eenvoudig
 - goed benoemd
 - makkelijk te begrijpen voor anderen
-
-## Snelle uitleg per map
-
-- core = basis van de auto
-- hardware = echte toestellen en sensoren
-- control = bestuurlijke logica
-- navigation = route en richting kiezen
-- safety = veilig rijden
-- tests = controle van de code
-
-## Opdracht voor de groep
-
-De volgende stappen zijn belangrijk:
-
-- sensoren beter koppelen aan echte hardware
-- gedrag voor de lijn volgen verbeteren
-- obstakels en slagbomen afhandelen
-- navigatie in de open ruimte bouwen
-- testen uitbreiden
-
-Dit project is bedoeld om stap voor stap te groeien.
