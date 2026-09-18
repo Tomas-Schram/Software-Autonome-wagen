@@ -70,3 +70,7 @@ Als iets veranderd, is het belangrijk om de code te houden:
 - eenvoudig
 - goed benoemd
 - makkelijk te begrijpen voor anderen
+
+Luuk, als je dit leest;
+1. Je bent een homo
+2. Ik ben trots op je dat je de software doorleest en wilt begrijpen :)
