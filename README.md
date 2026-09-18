@@ -54,7 +54,7 @@ Hier staan tests.
 
 Deze tests laten zien of de verschillende onderdelen werken. Ze zijn handig om te controleren of de code nog goed doet wat hij moet doen.
 
-## Voorbeeld van dewerking
+## Voorbeeld van de werking
 
 1. De auto leest sensoren.
 2. De auto beslist wat te doen.
@@ -63,9 +63,9 @@ Deze tests laten zien of de verschillende onderdelen werken. Ze zijn handig om t
 
 ## Belangrijk
 
-Dit is nog een begin. De code is gemaakt zodat de groep later makkelijk nieuwe onderdelen kan toevoegen.
+Dit is nog een begin. De repo is breed opgezet en logisch ingedeeld, zodat zowel Tomas als Casper gemakkelijk onderdelen kunnen toevoegen aan de bijbehorende bestanden.
 
-Als iets veranderd, is het belangrijk om de code te houden:
+Als iets verandert, is het belangrijk om de code te houden:
 - duidelijk
 - eenvoudig
 - goed benoemd
@@ -73,18 +73,19 @@ Als iets veranderd, is het belangrijk om de code te houden:
 
 ## Casper
 
-Casper is de andere software-medewerker van de groep. Hij kan hier aan werken door eerst de repo te openen in VS Code, dan de code te lezen en daarna een klein stukje te verbeteren of uit te breiden.
+Dit is alleen voor Casper. Je kunt aan de software werken door eerst de repo te openen in VS Code (of een andere codeomgeving), daarna de code te lezen en vervolgens te verbeteren, uit te breiden of toe te voegen.
 
 Gebruik deze stappen:
 1. open de repo in VS Code
 2. kies een klein onderdeel om aan te werken
-3. maak de code duidelijk en simpel
+3. maak de code duidelijk en simpelel
 4. run de tests om te checken of alles nog werkt
-5. commit de verandering met een korte duidelijke boodschap
+5. commit de verandering met een korte, duidelijke boodschap
 6. push naar GitHub zodat de rest van de groep het kan zien
 
 Zo blijven alle wijzigingen goed zichtbaar en makkelijk te bespreken.
 
 Luuk, als je dit leest;
-1. Je bent een homo
+1. Bedankt voor het meedenken en meelezen.
 2. Ik ben trots op je dat je de software doorleest en wilt begrijpen :)
+3. Je bent een homo.
