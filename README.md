@@ -71,6 +71,20 @@ Als iets veranderd, is het belangrijk om de code te houden:
 - goed benoemd
 - makkelijk te begrijpen voor anderen
 
+## Casper
+
+Casper is de andere software-medewerker van de groep. Hij kan hier aan werken door eerst de repo te openen in VS Code, dan de code te lezen en daarna een klein stukje te verbeteren of uit te breiden.
+
+Gebruik deze stappen:
+1. open de repo in VS Code
+2. kies een klein onderdeel om aan te werken
+3. maak de code duidelijk en simpel
+4. run de tests om te checken of alles nog werkt
+5. commit de verandering met een korte duidelijke boodschap
+6. push naar GitHub zodat de rest van de groep het kan zien
+
+Zo blijven alle wijzigingen goed zichtbaar en makkelijk te bespreken.
+
 Luuk, als je dit leest;
 1. Je bent een homo
 2. Ik ben trots op je dat je de software doorleest en wilt begrijpen :)
