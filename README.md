@@ -56,16 +56,6 @@ Deze tests laten zien of de verschillende onderdelen werken. Ze zijn handig om t
 3. De auto stuurt de motoren aan.
 4. Als er een probleem is, zoals een helling of een hindernis, wordt veilig afgeremd of gestopt.
 
-## Belangrijk
-
-Dit is nog een begin. De repo is breed opgezet en logisch ingedeeld, zodat zowel Tomas als Casper gemakkelijk onderdelen kunnen toevoegen aan de bijbehorende bestanden.
-
-Als iets verandert, is het belangrijk om de code te houden:
-- duidelijk
-- eenvoudig
-- goed benoemd
-- makkelijk te begrijpen voor anderen
-
 ## Casper
 
 Dit is alleen voor Casper. Je kunt aan de software werken door eerst de repo te openen in VS Code (of een andere codeomgeving), daarna de code te lezen en vervolgens te verbeteren, uit te breiden of toe te voegen.
