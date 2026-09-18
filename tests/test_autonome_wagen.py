@@ -4,6 +4,7 @@ from autonome_wagen.core import AutonomeWagen, DrivingMode
 from autonome_wagen.control.controller import VehicleController
 from autonome_wagen.hardware.motors import MotorDriver
 from autonome_wagen.hardware.sensors import LineSensor, UltrasonicSensor
+from autonome_wagen.hardware.microbit import MicrobitMotorDriver, MicrobitSoundPlayer
 from autonome_wagen.navigation.maze import MazeNavigator
 from autonome_wagen.navigation.open_space import OpenSpaceNavigator
 from autonome_wagen.safety.barrier import BarrierController, SoundController
@@ -92,3 +93,21 @@ def test_open_space_navigator_chooses_open_path_without_line() -> None:
     assert navigator.choose_direction(front_clear=True, left_clear=False, right_clear=False) == "forward"
     assert navigator.choose_direction(front_clear=False, left_clear=True, right_clear=False) == "left"
     assert navigator.choose_direction(front_clear=False, left_clear=False, right_clear=True) == "right"
+
+
+def test_microbit_motor_driver_wraps_hardware_commands() -> None:
+    adapter = MicrobitMotorDriver()
+
+    adapter.set_left_speed(80)
+    adapter.set_right_speed(30)
+
+    assert adapter.left_speed == 80
+    assert adapter.right_speed == 30
+
+
+def test_microbit_sound_player_calls_beep_method() -> None:
+    player = MicrobitSoundPlayer()
+
+    player.play("beep")
+
+    assert player.last_sound == "beep"

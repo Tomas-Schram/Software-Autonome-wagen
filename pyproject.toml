@@ -9,7 +9,7 @@ description = "Library voor de software van project 'Autonome Wagen'"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
-  { name = "Autonome Wagen Team" }
+  { name = "Tomas" }
 ]
 dependencies = []
 

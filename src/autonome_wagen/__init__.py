@@ -2,7 +2,7 @@
 
 from .core import AutonomeWagen, DrivingMode, VehicleState
 from .control import VehicleController
-from .hardware import LineSensor, MotorDriver, UltrasonicSensor
+from .hardware import LineSensor, MicrobitMotorDriver, MicrobitSoundPlayer, MotorDriver, UltrasonicSensor
 from .navigation import MazeNavigator
 from .navigation.open_space import OpenSpaceNavigator
 from .safety import BarrierController, SlopeDetector, SoundController
@@ -15,6 +15,8 @@ __all__ = [
     "MotorDriver",
     "LineSensor",
     "UltrasonicSensor",
+    "MicrobitMotorDriver",
+    "MicrobitSoundPlayer",
     "MazeNavigator",
     "OpenSpaceNavigator",
     "SlopeDetector",
