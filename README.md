@@ -8,11 +8,6 @@ Het doel is om een kleine auto te maken die zelfstandig door een doolhof kan rij
 
 Deze repo is een eerste basis voor de software. De code is zo opgebouwd dat alles logisch gescheiden is:
 
-- hardware: dingen die echt met de auto te maken hebben
-- control: regels voor hoe de auto beweegt
-- navigation: beslissen welke kant op te gaan
-- safety: veilig rijden, afremmen en stoppen
-- core: de basis van de auto
 
 ### Snelle uitleg per map
 
