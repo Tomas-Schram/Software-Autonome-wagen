@@ -1,5 +1,28 @@
 """Micro:bit-specific adapters for real hardware interaction."""
 
+try:
+    from microbit import accelerometer, speaker
+except ImportError:  # pragma: no cover - used when running on a normal computer
+    class _MicrobitAccelerometer:
+        def __init__(self) -> None:
+            self._pitch = 0.0
+
+        def get_pitch(self) -> float:
+            return self._pitch
+
+        def pitch(self) -> float:
+            return self._pitch
+
+    class _MicrobitSpeaker:
+        def __init__(self) -> None:
+            self.last_sound = None
+
+        def play(self, sound_name: str) -> None:
+            self.last_sound = sound_name
+
+    accelerometer = _MicrobitAccelerometer()
+    speaker = _MicrobitSpeaker()
+
 
 class MicrobitMotorDriver:
     """Adapter layer that wraps Micro:bit motor commands."""
@@ -21,12 +44,39 @@ class MicrobitMotorDriver:
         self.right_speed = float(power)
 
 
+class MicrobitTiltSensor:
+    """Read the Micro:bit accelerometer pitch and allow calibration per test run."""
+
+    def __init__(self) -> None:
+        self._offset_deg = 0.0
+
+    def calibrate(self) -> None:
+        """Set the current orientation as the zero point for this run."""
+        self._offset_deg = self._read_pitch_degrees()
+
+    def _read_pitch_degrees(self) -> float:
+        getter = getattr(accelerometer, "get_pitch", None)
+        if callable(getter):
+            return float(getter())
+        if hasattr(accelerometer, "pitch"):
+            return float(accelerometer.pitch())
+        return 0.0
+
+    def get_relative_pitch_degrees(self) -> float:
+        """Return the current pitch difference from the calibrated zero point."""
+        return abs(self._read_pitch_degrees() - self._offset_deg)
+
+
 class MicrobitSoundPlayer:
-    """Adapter for making a sound on the Micro:bit hardware."""
+    """Adapter for making a sound on the Micro:bit built-in speaker."""
 
     def __init__(self) -> None:
         self.last_sound = None
+        self.output = "speaker"
 
     def play(self, sound_name: str) -> None:
-        """Play a sound name and store the last sound for verification."""
+        """Play a sound via the Micro:bit speaker and store the last sound for verification."""
         self.last_sound = sound_name
+        self.output = "speaker"
+        if hasattr(speaker, "play"):
+            speaker.play(sound_name)

@@ -1,10 +1,11 @@
 import pytest
 
 from autonome_wagen.core import AutonomeWagen, DrivingMode
-from autonome_wagen.control.controller import VehicleController
+from autonome_wagen.control.controller import AutonomousDriveLoop, VehicleController
+from autonome_wagen.hardware import MicrobitTiltSensor as ExportedMicrobitTiltSensor
 from autonome_wagen.hardware.motors import MotorDriver
 from autonome_wagen.hardware.sensors import LineSensor, UltrasonicSensor
-from autonome_wagen.hardware.microbit import MicrobitMotorDriver, MicrobitSoundPlayer
+from autonome_wagen.hardware.microbit import MicrobitMotorDriver, MicrobitSoundPlayer, MicrobitTiltSensor
 from autonome_wagen.navigation.maze import MazeNavigator
 from autonome_wagen.navigation.open_space import OpenSpaceNavigator
 from autonome_wagen.safety.barrier import BarrierController, SoundController
@@ -117,10 +118,58 @@ def test_line_sensor_reports_binary_reading() -> None:
 
 def test_slope_detector_identifies_decline_and_reduces_speed() -> None:
     detector = SlopeDetector(threshold_deg=8.0)
-    detector.pitch_angle_deg = 12.0
+    detector.calibrate(0.0)
+    detector.update_pitch(18.0)
 
     assert detector.is_on_slope() is True
-    assert detector.recommended_speed_factor() == 0.5
+    assert detector.recommended_speed_factor() == pytest.approx(0.5)
+
+
+def test_vehicle_controller_reduces_power_on_slope() -> None:
+    car = AutonomeWagen(initial_mode=DrivingMode.AUTONOMOUS)
+    controller = VehicleController(car)
+    detector = SlopeDetector(threshold_deg=8.0)
+    detector.calibrate(0.0)
+    detector.update_pitch(18.0)
+
+    assert controller.apply_slope_limit(0.8, detector) == pytest.approx(0.4)
+
+
+def test_slope_detector_calibrates_on_startup() -> None:
+    detector = SlopeDetector(threshold_deg=8.0)
+    detector.calibrate(5.0)
+    detector.update_pitch(12.0)
+
+    assert detector.pitch_angle_deg == 7.0
+    assert detector.is_on_slope() is False
+
+    detector.update_pitch(18.0)
+    assert detector.is_on_slope() is True
+
+
+def test_slope_detector_uses_microbit_tilt_sensor_when_provided(monkeypatch) -> None:
+    class FakeAccelerometer:
+        def __init__(self, values):
+            self._values = values
+            self._index = 0
+
+        def get_pitch(self):
+            value = self._values[self._index]
+            self._index = min(self._index + 1, len(self._values) - 1)
+            return value
+
+    sensor = MicrobitTiltSensor()
+    detector = SlopeDetector(threshold_deg=8.0, tilt_sensor=sensor)
+
+    from autonome_wagen.hardware import microbit
+
+    monkeypatch.setattr(microbit, "accelerometer", FakeAccelerometer([0.0, 18.0]))
+
+    detector.calibrate()
+    detector.update_pitch()
+
+    assert detector.pitch_angle_deg == pytest.approx(18.0)
+    assert detector.is_on_slope() is True
 
 
 def test_barrier_controller_stops_and_plays_sound_on_slagboom() -> None:
@@ -158,3 +207,34 @@ def test_microbit_sound_player_calls_beep_method() -> None:
     player.play("beep")
 
     assert player.last_sound == "beep"
+
+
+def test_autonomous_drive_loop_runs_safe_slope_aware_cycle() -> None:
+    car = AutonomeWagen(initial_mode=DrivingMode.AUTONOMOUS)
+    controller = VehicleController(car)
+    detector = SlopeDetector(threshold_deg=8.0)
+    detector.calibrate(0.0)
+    loop = AutonomousDriveLoop(car, controller=controller, slope_detector=detector)
+
+    result = loop.run_cycle(front_clear=True, pitch_angle_deg=18.0)
+
+    assert result == "forward"
+    assert car.state.mode == DrivingMode.AUTONOMOUS
+    assert car.state.power == pytest.approx(0.2)
+    assert car.state.steering_angle_deg == 0.0
+
+    detector.calibrate(0.0)
+    result = loop.run_cycle(front_clear=False, turn_direction="right")
+
+    assert result == "right"
+    assert car.state.mode == DrivingMode.SAFE
+    assert car.state.power == 0.0
+
+
+def test_microbit_tilt_sensor_is_exposed_through_package_exports() -> None:
+    assert ExportedMicrobitTiltSensor is MicrobitTiltSensor
+
+    import autonome_wagen
+
+    assert hasattr(autonome_wagen, "MicrobitTiltSensor")
+    assert autonome_wagen.MicrobitTiltSensor is MicrobitTiltSensor
