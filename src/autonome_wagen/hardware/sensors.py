@@ -4,7 +4,7 @@
 class UltrasonicSensor:
     """HC-SR04 style ultrasonic distance sensor."""
 
-    def __init__(self, threshold_cm: float = 20.0) -> None:
+    def __init__(self, threshold_cm: float = 10.0) -> None:
         self.distance_cm = 0.0
         self.threshold_cm = threshold_cm
 

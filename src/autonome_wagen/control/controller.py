@@ -10,12 +10,21 @@ class VehicleController:
         self.vehicle = vehicle
         self.normal_power = 0.4
         self.boost_power = 0.8
+        self.slow_power = 0.2
 
-    def drive_forward(self, power: float | None = None, *, boost_zone: bool = False) -> None:
-        """Drive forward using a normalized motor power fraction, with a default cruising speed."""
+    def drive_forward(self, power: float | None = None, *, boost_zone: bool = False, slow_zone: bool = False) -> None:
+        """Drive forward using a normalized motor power fraction, with a default cruising speed and special zones."""
         self.vehicle.set_mode(DrivingMode.AUTONOMOUS)
 
-        target_power = power if power is not None else (self.boost_power if boost_zone else self.normal_power)
+        if power is not None:
+            target_power = power
+        elif boost_zone:
+            target_power = self.boost_power
+        elif slow_zone:
+            target_power = self.slow_power
+        else:
+            target_power = self.normal_power
+
         self.vehicle.set_speed(target_power)
 
     def handle_obstacle(self, *, front_clear: bool, turn_direction: str = "left") -> str:

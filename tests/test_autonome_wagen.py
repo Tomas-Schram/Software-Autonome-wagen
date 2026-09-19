@@ -42,6 +42,22 @@ def test_motor_driver_tracks_left_and_right_speed() -> None:
     assert motor_driver.right_speed == 0.4
 
 
+def test_motor_driver_pin_configuration_is_changeable() -> None:
+    motor_driver = MotorDriver()
+
+    motor_driver.configure_pins(
+        left_enable_pin=9,
+        right_enable_pin=10,
+        left_direction_pin=11,
+        right_direction_pin=12,
+    )
+
+    assert motor_driver.left_enable_pin == 9
+    assert motor_driver.right_enable_pin == 10
+    assert motor_driver.left_direction_pin == 11
+    assert motor_driver.right_direction_pin == 12
+
+
 def test_ultrasonic_sensor_reads_distance_and_detects_obstacle() -> None:
     sensor = UltrasonicSensor(threshold_cm=20)
     sensor.distance_cm = 15
@@ -63,7 +79,7 @@ def test_vehicle_controller_stops_when_obstacle_detected() -> None:
     assert car.state.steering_angle_deg < 0.0
 
 
-def test_vehicle_controller_uses_standard_driving_power_and_boost_zone() -> None:
+def test_vehicle_controller_uses_standard_driving_power_and_zone_variants() -> None:
     car = AutonomeWagen(initial_mode=DrivingMode.AUTONOMOUS)
     controller = VehicleController(car)
 
@@ -72,6 +88,9 @@ def test_vehicle_controller_uses_standard_driving_power_and_boost_zone() -> None
 
     controller.drive_forward(boost_zone=True)
     assert car.state.power == 0.8
+
+    controller.drive_forward(slow_zone=True)
+    assert car.state.power == 0.2
 
 
 def test_maze_navigator_decides_turn_from_sensor_readings() -> None:
