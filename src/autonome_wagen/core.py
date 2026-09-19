@@ -7,7 +7,6 @@ from enum import Enum
 class DrivingMode(str, Enum):
     """Supported driving modes for the autonomous vehicle."""
 
-    MANUAL = "manual"
     AUTONOMOUS = "autonomous"
     SAFE = "safe"
 

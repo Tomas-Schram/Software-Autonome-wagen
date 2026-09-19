@@ -17,6 +17,8 @@ def test_default_state_is_safe_and_stopped() -> None:
     assert car.state.power == 0.0
     assert car.state.steering_angle_deg == 0.0
     assert car.state.mode == DrivingMode.SAFE
+    assert hasattr(DrivingMode, "AUTONOMOUS")
+    assert not hasattr(DrivingMode, "MANUAL")
 
 
 def test_set_speed_validates_power_percentage_range() -> None:
