@@ -14,19 +14,32 @@ from autonome_wagen.safety.slope import SlopeDetector
 def test_default_state_is_safe_and_stopped() -> None:
     car = AutonomeWagen()
 
-    assert car.state.speed_kmh == 0.0
+    assert car.state.power == 0.0
     assert car.state.steering_angle_deg == 0.0
     assert car.state.mode == DrivingMode.SAFE
+
+
+def test_set_speed_validates_power_percentage_range() -> None:
+    car = AutonomeWagen()
+
+    car.set_speed(0.75)
+    assert car.state.power == 0.75
+
+    with pytest.raises(ValueError, match="between 0 and 1"):
+        car.set_speed(-0.1)
+
+    with pytest.raises(ValueError, match="between 0 and 1"):
+        car.set_speed(1.5)
 
 
 def test_motor_driver_tracks_left_and_right_speed() -> None:
     motor_driver = MotorDriver()
 
-    motor_driver.set_left_speed(60)
-    motor_driver.set_right_speed(40)
+    motor_driver.set_left_speed(0.6)
+    motor_driver.set_right_speed(0.4)
 
-    assert motor_driver.left_speed == 60
-    assert motor_driver.right_speed == 40
+    assert motor_driver.left_speed == 0.6
+    assert motor_driver.right_speed == 0.4
 
 
 def test_ultrasonic_sensor_reads_distance_and_detects_obstacle() -> None:
@@ -41,11 +54,24 @@ def test_vehicle_controller_stops_when_obstacle_detected() -> None:
     car = AutonomeWagen(initial_mode=DrivingMode.AUTONOMOUS)
     controller = VehicleController(car)
 
-    controller.drive_forward(25)
-    controller.handle_obstacle()
+    controller.drive_forward(0.25)
+    result = controller.handle_obstacle(front_clear=False, turn_direction="left")
 
+    assert result == "left"
     assert car.state.mode == DrivingMode.SAFE
-    assert car.state.speed_kmh == 0.0
+    assert car.state.power == 0.0
+    assert car.state.steering_angle_deg < 0.0
+
+
+def test_vehicle_controller_uses_standard_driving_power_and_boost_zone() -> None:
+    car = AutonomeWagen(initial_mode=DrivingMode.AUTONOMOUS)
+    controller = VehicleController(car)
+
+    controller.drive_forward()
+    assert car.state.power == 0.4
+
+    controller.drive_forward(boost_zone=True)
+    assert car.state.power == 0.8
 
 
 def test_maze_navigator_decides_turn_from_sensor_readings() -> None:
@@ -98,11 +124,11 @@ def test_open_space_navigator_chooses_open_path_without_line() -> None:
 def test_microbit_motor_driver_wraps_hardware_commands() -> None:
     adapter = MicrobitMotorDriver()
 
-    adapter.set_left_speed(80)
-    adapter.set_right_speed(30)
+    adapter.set_left_speed(0.8)
+    adapter.set_right_speed(0.3)
 
-    assert adapter.left_speed == 80
-    assert adapter.right_speed == 30
+    assert adapter.left_speed == 0.8
+    assert adapter.right_speed == 0.3
 
 
 def test_microbit_sound_player_calls_beep_method() -> None:
