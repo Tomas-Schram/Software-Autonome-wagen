@@ -2,7 +2,14 @@ import pytest
 
 from autonome_wagen.core import AutonomeWagen, DrivingMode
 from autonome_wagen.control.controller import AutonomousDriveLoop, VehicleController
-from autonome_wagen.hardware import MicrobitTiltSensor as ExportedMicrobitTiltSensor
+from autonome_wagen.hardware import (
+    DriverBoardConfig,
+    MicrobitButtonSensor,
+    MicrobitCompassSensor,
+    MicrobitMotionSensor,
+    MicrobitTemperatureSensor,
+    MicrobitTiltSensor as ExportedMicrobitTiltSensor,
+)
 from autonome_wagen.hardware.motors import MotorDriver
 from autonome_wagen.hardware.sensors import LineSensor, UltrasonicSensor
 from autonome_wagen.hardware.microbit import MicrobitMotorDriver, MicrobitSoundPlayer, MicrobitTiltSensor
@@ -59,6 +66,86 @@ def test_motor_driver_pin_configuration_is_changeable() -> None:
     assert motor_driver.right_enable_pin == 10
     assert motor_driver.left_direction_pin == 11
     assert motor_driver.right_direction_pin == 12
+
+
+def test_driver_board_config_can_be_used_as_a_single_hardware_contract() -> None:
+    config = DriverBoardConfig(
+        left_enable_pin=17,
+        right_enable_pin=18,
+        left_direction_pin=19,
+        right_direction_pin=20,
+    )
+
+    motor_driver = MotorDriver(config=config)
+
+    assert motor_driver.config == config
+    assert motor_driver.left_enable_pin == 17
+    assert motor_driver.right_enable_pin == 18
+    assert motor_driver.left_direction_pin == 19
+    assert motor_driver.right_direction_pin == 20
+
+
+def test_microbit_sensor_adapters_use_hardware_calls_when_available(monkeypatch) -> None:
+    import autonome_wagen.hardware.sensors as sensors
+
+    class FakeAccelerometer:
+        def __init__(self):
+            self._pitch = 0.0
+            self._roll = 0.0
+
+        def get_pitch(self):
+            return self._pitch
+
+        def get_roll(self):
+            return self._roll
+
+        def set_state(self, pitch, roll):
+            self._pitch = pitch
+            self._roll = roll
+
+    class FakeCompass:
+        def heading(self):
+            return 90.0
+
+        def calibrate(self):
+            return "calibrated"
+
+    class FakeButton:
+        def __init__(self, pressed):
+            self._pressed = pressed
+
+        def is_pressed(self):
+            return self._pressed
+
+    fake_accelerometer = FakeAccelerometer()
+    monkeypatch.setattr(sensors, "accelerometer", fake_accelerometer)
+    monkeypatch.setattr(sensors, "compass", FakeCompass())
+    monkeypatch.setattr(sensors, "button_a", FakeButton(True))
+    monkeypatch.setattr(sensors, "button_b", FakeButton(False))
+    monkeypatch.setattr(sensors, "temperature", lambda: 21)
+
+    fake_accelerometer.set_state(0.0, 0.0)
+    motion = MicrobitMotionSensor()
+    motion.calibrate()
+
+    fake_accelerometer.set_state(18.0, 12.0)
+
+    assert motion.get_pitch() == pytest.approx(18.0)
+    assert motion.get_roll() == pytest.approx(12.0)
+    assert motion.is_tilted(threshold_deg=10) is True
+
+    compass = MicrobitCompassSensor()
+    assert compass.get_heading() == pytest.approx(90.0)
+    assert compass.is_ready() is True
+
+    temp = MicrobitTemperatureSensor()
+    assert temp.read_celsius() == 21
+    assert temp.read_fahrenheit() == pytest.approx(69.8)
+
+    left_button = MicrobitButtonSensor("left")
+    right_button = MicrobitButtonSensor("right")
+    assert left_button.is_pressed() is True
+    assert right_button.is_pressed() is False
 
 
 def test_ultrasonic_sensor_reads_distance_and_detects_obstacle() -> None:

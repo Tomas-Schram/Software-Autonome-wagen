@@ -3,9 +3,14 @@
 from .core import AutonomeWagen, DrivingMode, VehicleState
 from .control import VehicleController
 from .hardware import (
+    DriverBoardConfig,
     LineSensor,
+    MicrobitButtonSensor,
+    MicrobitCompassSensor,
+    MicrobitMotionSensor,
     MicrobitMotorDriver,
     MicrobitSoundPlayer,
+    MicrobitTemperatureSensor,
     MicrobitTiltSensor,
     MotorDriver,
     UltrasonicSensor,
@@ -20,8 +25,13 @@ __all__ = [
     "VehicleState",
     "VehicleController",
     "MotorDriver",
+    "DriverBoardConfig",
     "LineSensor",
     "UltrasonicSensor",
+    "MicrobitMotionSensor",
+    "MicrobitCompassSensor",
+    "MicrobitTemperatureSensor",
+    "MicrobitButtonSensor",
     "MicrobitMotorDriver",
     "MicrobitSoundPlayer",
     "MicrobitTiltSensor",
