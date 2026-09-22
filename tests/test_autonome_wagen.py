@@ -29,6 +29,11 @@ def test_default_state_is_safe_and_stopped() -> None:
     assert not hasattr(DrivingMode, "MANUAL")
 
 
+def test_default_drive_mode_is_named_default_drive() -> None:
+    assert DrivingMode.DEFAULT_DRIVE.value == "default drive"
+    assert DrivingMode.AUTONOMOUS.value == "default drive"
+
+
 def test_set_speed_validates_power_percentage_range() -> None:
     car = AutonomeWagen()
 

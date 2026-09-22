@@ -12,7 +12,10 @@ authors = [
   { name = "Tomas" },
   { name = "Casper" }
 ]
-dependencies = []
+dependencies = [
+  "smbus2>=0.4.3",
+  "pyserial>=3.5",
+]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

@@ -1,4 +1,8 @@
-"""Vehicle control logic and safety decisions."""
+"""Vehicle control logic and safety decisions.
+
+This controller is intentionally kept small and dependency-light so it can be
+ported to MicroPython without requiring the full desktop Python runtime.
+"""
 
 from autonome_wagen.core import AutonomeWagen, DrivingMode
 from autonome_wagen.safety.slope import SlopeDetector
@@ -7,13 +11,13 @@ from autonome_wagen.safety.slope import SlopeDetector
 class VehicleController:
     """High-level controller for the robot vehicle."""
 
-    def __init__(self, vehicle: AutonomeWagen) -> None:
+    def __init__(self, vehicle):
         self.vehicle = vehicle
         self.normal_power = 0.4
         self.boost_power = 0.8
         self.slow_power = 0.2
 
-    def drive_forward(self, power: float | None = None, *, boost_zone: bool = False, slow_zone: bool = False) -> None:
+    def drive_forward(self, power=None, boost_zone=False, slow_zone=False):
         """Drive forward using a normalized motor power fraction, with a default cruising speed and special zones."""
         self.vehicle.set_mode(DrivingMode.AUTONOMOUS)
 
@@ -27,8 +31,9 @@ class VehicleController:
             target_power = self.normal_power
 
         self.vehicle.set_speed(target_power)
+        return target_power
 
-    def apply_slope_limit(self, base_power: float, slope_detector: SlopeDetector) -> float:
+    def apply_slope_limit(self, base_power, slope_detector):
         """Reduce power inversely as the slope steepens, while preserving a minimum floor."""
         if not slope_detector.is_on_slope():
             return float(base_power)
@@ -36,7 +41,7 @@ class VehicleController:
         reduced_power = base_power * slope_detector.recommended_speed_factor()
         return max(0.0, reduced_power)
 
-    def handle_obstacle(self, *, front_clear: bool, turn_direction: str = "left") -> str:
+    def handle_obstacle(self, front_clear=True, turn_direction="left"):
         """Brake immediately on a front obstacle and turn in the preferred direction."""
         self.vehicle.set_mode(DrivingMode.SAFE)
         self.vehicle.set_speed(0.0)
@@ -58,26 +63,13 @@ class VehicleController:
 class AutonomousDriveLoop:
     """Continuously update the vehicle state using real sensor inputs."""
 
-    def __init__(
-        self,
-        vehicle: AutonomeWagen,
-        *,
-        controller: VehicleController | None = None,
-        slope_detector: SlopeDetector | None = None,
-        normal_power: float = 0.4,
-    ) -> None:
+    def __init__(self, vehicle, controller=None, slope_detector=None, normal_power=0.4):
         self.vehicle = vehicle
         self.controller = controller or VehicleController(vehicle)
         self.slope_detector = slope_detector or SlopeDetector()
         self.normal_power = float(normal_power)
 
-    def run_cycle(
-        self,
-        *,
-        front_clear: bool,
-        pitch_angle_deg: float | None = None,
-        turn_direction: str = "left",
-    ) -> str:
+    def run_cycle(self, front_clear=True, pitch_angle_deg=None, turn_direction="left"):
         """Evaluate the current environment and update the vehicle state."""
         if pitch_angle_deg is not None:
             self.slope_detector.calibrate(0.0)
