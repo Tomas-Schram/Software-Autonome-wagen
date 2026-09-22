@@ -1,76 +1,80 @@
-# Software-Autonome-wagen
+# Autonome Wagen
 
-Dit project is de software voor de autonome wagen.
+This project is the software for an autonomous robot car. The current design treats the Micro:Bit as the robot controller, while this repository remains the host-side development and testing codebase.
 
-Het doel is om een kleine auto te maken die zelfstandig door een doolhof kan rijden.
+## Architecture
 
-## Wat staat hier?
+The Micro:Bit is the controller of the robot, not a passive peripheral.
 
-Deze repo is een eerste basis voor de software. De code is zo opgebouwd dat alles logisch gescheiden is:
+That means:
+- the board runs a small MicroPython control loop
+- this repository is used for design, validation, and higher-level logic
+- the full repo is not flashed to the Micro:Bit as-is
+- the board firmware is a compact controller script, not the desktop Python project
 
+## Repository layout
 
-### Snelle uitleg per map
+- `src/autonome_wagen/core.py`  
+  Core vehicle state and drive modes.
 
-- core = basis van de auto
-- hardware = echte toestellen en sensoren
-- control = bestuurlijke logica
-- navigation = route en richting kiezen
-- safety = veilig rijden
-- tests = controle van de code
+- `src/autonome_wagen/control/controller.py`  
+  Control logic for driving and safety decisions.
 
-## Waar vind je wat?
+- `src/autonome_wagen/hardware/`  
+  Hardware abstractions for motors and Micro:Bit sensors.
 
-### src/autonome_wagen/
-Dit is de hoofdmap van de software.
+- `src/autonome_wagen/navigation/`  
+  Navigation logic for open-space and line-based decisions.
 
-- core.py  
-  De basis van de auto. Hier staat bijvoorbeeld de status van de wagen.
+- `src/autonome_wagen/safety/`  
+  Safety logic for slope checks and barrier behavior.
 
-- hardware/  
-  Hier staan de interfaces voor de echte onderdelen:
-  - motoren
-  - sensoren
-  - Micro:bit-verbinding
+- `src/autonome_wagen/micropython_controller.py`  
+  MicroPython-friendly controller entry point for the Micro:Bit.
 
-- control/  
-  Hier staat de logica voor beweging en veiligheid.
+- `tests/`  
+  Regression tests for the project logic.
 
-- navigation/  
-  Hier staat de logica voor het volgen van een lijn en het kiezen van een richting in een open ruimte.
+## Default drive mode
 
-- safety/  
-  Hier staat alles over veiligheid:
-  - helling detecteren
-  - slagboom stoppen
-  - geluidssignaal
+The default autonomous driving mode is named:
 
-### tests/
-Hier staan tests.
+- `default drive`
 
-Deze tests laten zien of de verschillende onderdelen werken. Ze zijn handig om te controleren of de code nog goed doet wat hij moet doen.
+This is the normal operating state when the robot is moving without a special safety or obstacle override.
 
-## Voorbeeld van de werking
+## Validation
 
-1. De auto leest sensoren.
-2. De auto beslist wat te doen.
-3. De auto stuurt de motoren aan.
-4. Als er een probleem is, zoals een helling of een hindernis, wordt veilig afgeremd of gestopt.
+Run the Python test suite locally:
 
-## Casper
+```bash
+python -m pytest -q
+```
 
-Dit is alleen voor Casper. Je kunt aan de software werken door eerst de repo te openen in VS Code (of een andere codeomgeving), daarna de code te lezen en vervolgens te verbeteren, uit te breiden of toe te voegen.
+The repo is validated through these tests before hardware changes are made.
 
-Gebruik deze stappen:
-1. open de repo in VS Code
-2. kies een klein onderdeel om aan te werken
-3. maak de code duidelijk en simpelel
-4. run de tests om te checken of alles nog werkt
-5. commit de verandering met een korte, duidelijke boodschap
-6. push naar GitHub zodat de rest van de groep het kan zien
+## Flashing the Micro:Bit
 
-Zo blijven alle wijzigingen goed zichtbaar en makkelijk te bespreken.
+Do not flash the entire repo onto the Micro:Bit.
 
-Luuk, als je dit leest;
-1. Bedankt voor het meedenken en meelezen.
-2. Ik ben trots op je dat je de software doorleest en wilt begrijpen :)
-3. Je bent een homo.
+Instead, flash a small MicroPython controller script that contains only the robot control logic. That script should:
+- read inputs from sensors or buttons
+- decide movement
+- update the vehicle mode
+- control drive outputs or motor commands
+- optionally show status on the display
+
+## Recommended workflow
+
+1. Update the design logic in this repository
+2. Validate it with pytest
+3. Extract the relevant control behavior into a MicroPython script
+4. Flash that script to the Micro:Bit
+5. Test the robot on hardware
+6. Iterate and reflash as needed
+
+## Summary
+
+This repo supports an embedded-controller approach:
+- host machine: development, prototyping, and tests
+- Micro:Bit: onboard robot controller
